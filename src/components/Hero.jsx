@@ -1,7 +1,8 @@
 import React from 'react';
 import { ArrowRight, Sparkles, ShieldCheck, Plane, CheckCircle2, ShoppingCart, MessageCircle } from 'lucide-react';
+import { convertFromTRY, formatCurrency } from '../utils/currency';
 
-export default function Hero({ onOpenWizard, scrollToCatalog }) {
+export default function Hero({ onOpenWizard, scrollToCatalog, currency, rates }) {
   return (
     <section className="relative overflow-hidden pt-8 pb-16 lg:pt-14 lg:pb-24 border-b border-euro-800/30">
       {/* Background radial gradients */}
@@ -113,7 +114,10 @@ export default function Hero({ onOpenWizard, scrollToCatalog }) {
                 </h3>
                 <div className="flex items-baseline justify-between pt-1">
                   <div className="text-2xl font-black text-amber-400 font-display">
-                    9.700 ₺ <span className="text-xs font-normal text-slate-400">/ ~255 €</span>
+                    {formatCurrency(convertFromTRY(9700, currency, rates), currency)}{' '}
+                    <span className="text-xs font-normal text-slate-400 font-mono">
+                      {currency === 'TRY' ? `(~ €${convertFromTRY(9700, 'EUR', rates)})` : `(~ 9.700 ₺)`}
+                    </span>
                   </div>
                   <span className="text-xs text-slate-400 font-medium">
                     Ücretsiz Kargo
