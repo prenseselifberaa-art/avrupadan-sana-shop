@@ -1,5 +1,6 @@
 import { ExternalLink, ShieldCheck, Heart, Plane, MessageCircle } from 'lucide-react';
 import InstagramIcon from './InstagramIcon';
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from '../data/products';
 
 export default function Footer() {
   return (
@@ -11,11 +12,13 @@ export default function Footer() {
           {/* Col 1: Brand */}
           <div className="space-y-4 md:col-span-2">
             <div className="flex items-center gap-3">
-              <img 
-                src="/logo.jpg" 
-                alt="Avrupadan Sana Shop" 
-                className="w-10 h-10 rounded-xl object-contain bg-white/10 p-0.5 border border-euro-700/60"
-              />
+              <div className="h-11 w-auto bg-white rounded-xl p-1 shadow-md border border-slate-300/40 flex items-center justify-center shrink-0">
+                <img 
+                  src="/logo.jpg" 
+                  alt="Avrupadan Sana Shop" 
+                  className="h-full w-auto object-contain rounded-lg"
+                />
+              </div>
               <span className="text-lg font-extrabold text-white font-display">
                 Avrupadan<span className="text-euro-400">.Sana</span><span className="text-amber-400">.Shop</span>
               </span>
@@ -32,9 +35,20 @@ export default function Footer() {
           {/* Col 2: Platform Links */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Resmi Satış Hesapları
+              Resmi Satış & İletişim
             </h4>
             <ul className="space-y-2 text-xs">
+              <li>
+                <a 
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Merhaba! Avrupadan.Sana.Shop üzerinden bilgi almak istiyorum.')}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-emerald-300 text-emerald-400 font-semibold transition flex items-center gap-1.5"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>WhatsApp: {WHATSAPP_DISPLAY}</span>
+                </a>
+              </li>
               <li>
                 <a 
                   href="https://www.instagram.com/avrupadan.sana.shop" 

@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Trash2, Plus, Minus, ShoppingBag, MessageCircle, ExternalLink, ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { convertFromTRY, formatCurrency } from '../utils/currency';
+import { WHATSAPP_NUMBER } from '../data/products';
 
 export default function CartDrawer({ 
   isOpen, 
@@ -40,7 +41,7 @@ ${itemsSummary}
 ---------------------------------
 Merhaba! Sepetimdeki bu ürünleri satın almak istiyorum. Ödeme ve kargo detaylarını paylaşabilir misiniz?`;
 
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 

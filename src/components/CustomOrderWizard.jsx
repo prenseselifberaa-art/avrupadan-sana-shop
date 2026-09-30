@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Sparkles, Send, Plane, HelpCircle, Check, ArrowRight, MessageCircle, DollarSign, Calculator, TrendingUp } from 'lucide-react';
+import { WHATSAPP_NUMBER } from '../data/products';
 
 const STORE_PRESETS = [
   { name: 'Almanya DM', domain: 'dm.de', icon: '🇩🇪' },
@@ -46,7 +47,7 @@ export default function CustomOrderWizard({ isOpen, onClose, rates }) {
 ---------------------------------
 Avrupadan.Sana.Shop üzerinden bu ürünün getirilme maliyeti ve teslimat süresi hakkında teklif rica ediyorum.`;
 
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 

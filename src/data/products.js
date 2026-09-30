@@ -2,6 +2,10 @@
 // Gardrops: https://www.gardrops.com/avrupadansana1
 // Dolap: https://dolap.com/profil/avrupadansana1
 // Instagram: @avrupadan.sana.shop
+// WhatsApp: +90 551 831 99 58
+
+export const WHATSAPP_NUMBER = '905518319958';
+export const WHATSAPP_DISPLAY = '+90 551 831 99 58';
 
 export const CATEGORIES = [
   { id: 'all', label: 'Tüm Ürünler', icon: 'Sparkles' },

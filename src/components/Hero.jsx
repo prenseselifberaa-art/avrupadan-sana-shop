@@ -24,8 +24,8 @@ export default function Hero({ onOpenWizard, scrollToCatalog, currency, rates })
             </div>
 
             {/* Main Title */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1] font-display">
-              Avrupa'nın Seçkin Ürünleri <br />
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] font-display">
+              Avrupa'nın Seçkin Ürünleri <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-blue-400 via-euro-400 to-amber-300 bg-clip-text text-transparent">
                 Doğrudan Kapınızda.
               </span>

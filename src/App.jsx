@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
+import React, { useState, useEffect, useRef } from 'react';
+import AnnouncementBar from './components/AnnouncementBar';
+import HeaderBar from './components/HeaderBar';
+import NavigationDrawer from './components/NavigationDrawer';
+import FilterSortBar from './components/FilterSortBar';
+import SearchBar from './components/SearchBar';
 import StoryHighlights from './components/StoryHighlights';
 import StoryModal from './components/StoryModal';
 import Hero from './components/Hero';
@@ -13,7 +17,7 @@ import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import { CATEGORIES, PRODUCTS } from './data/products';
 import { fetchLiveRates } from './utils/currency';
-import { Search, Sparkles, Plane, Check, ArrowRight, ShoppingBag, TrendingUp } from 'lucide-react';
+import { Sparkles, Plane, Check, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -23,7 +27,12 @@ export default function App() {
   const [selectedStory, setSelectedStory] = useState(null);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('featured');
+  const [mobileCols, setMobileCols] = useState(2);
   const [toastMessage, setToastMessage] = useState(null);
+
+  const searchInputRef = useRef(null);
 
   // Live Exchange Rates
   const [rates, setRates] = useState({
@@ -73,7 +82,7 @@ export default function App() {
         return [...prev, { ...product, quantity: 1 }];
       }
     });
-    showToast(`"${product.title.slice(0, 28)}..." sepete eklendi!`);
+    showToast(`"${product.title.slice(0, 24)}..." sepete eklendi!`);
   };
 
   const handleUpdateQuantity = (id, newQty) => {
@@ -105,7 +114,24 @@ export default function App() {
     }
   };
 
-  // Filter products
+  const scrollToCatalog = () => {
+    document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleFocusSearch = () => {
+    scrollToCatalog();
+    setTimeout(() => {
+      if (searchInputRef.current) {
+        searchInputRef.current.focus();
+      }
+    }, 300);
+  };
+
+  // Filter & Sort Products
   const filteredProducts = PRODUCTS.filter(p => {
     const matchesCat = selectedCategory === 'all' || p.category === selectedCategory;
     const matchesSearch = 
@@ -115,20 +141,21 @@ export default function App() {
     return matchesCat && matchesSearch;
   });
 
-  const scrollToCatalog = () => {
-    document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === 'price-asc') return a.priceTRY - b.priceTRY;
+    if (sortBy === 'price-desc') return b.priceTRY - a.priceTRY;
+    if (sortBy === 'rare') return (b.isRare ? 1 : 0) - (a.isRare ? 1 : 0);
+    return 0; // featured
+  });
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const cartTotalCount = cart.reduce((a, b) => a + b.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-[#070e1b] text-slate-100 flex flex-col font-sans pb-16 md:pb-0">
+    <div className="min-h-screen bg-[#070e1b] text-slate-100 flex flex-col font-sans pb-20 md:pb-0">
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 glass-card px-4 py-3 rounded-xl border border-euro-500/50 shadow-2xl flex items-center gap-2.5 text-xs font-bold text-white animate-in slide-in-from-bottom duration-300">
+        <div className="fixed bottom-22 md:bottom-6 right-4 sm:right-6 z-50 glass-card px-4 py-3 rounded-xl border border-euro-500/50 shadow-2xl flex items-center gap-2.5 text-xs font-bold text-white animate-in slide-in-from-bottom duration-300">
           <div className="w-5 h-5 rounded-full bg-euro-600 flex items-center justify-center shrink-0">
             <Check className="w-3 h-3 text-white" />
           </div>
@@ -136,22 +163,40 @@ export default function App() {
         </div>
       )}
 
-      {/* Navigation */}
-      <Navbar 
-        cartCount={cart.reduce((a, b) => a + b.quantity, 0)}
+      {/* 1. Announcement Bar (Promo / Live Currency Ticker) */}
+      <AnnouncementBar rates={rates} />
+
+      {/* 2. Header Bar (Top App Bar / Sticky Navbar) */}
+      <HeaderBar 
+        onOpenDrawer={() => setIsDrawerOpen(true)}
+        cartCount={cartTotalCount}
         onOpenCart={() => setIsCartOpen(true)}
         currency={currency}
         setCurrency={setCurrency}
         onOpenWizard={() => setIsWizardOpen(true)}
+        onFocusSearch={handleFocusSearch}
+      />
+
+      {/* 3. Navigation Drawer (Slide-out Sidebar / Off-Canvas Menu) */}
+      <NavigationDrawer 
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        currency={currency}
+        setCurrency={setCurrency}
+        onOpenWizard={() => setIsWizardOpen(true)}
+        onSelectCategory={(catId) => {
+          setSelectedCategory(catId);
+          scrollToCatalog();
+        }}
         rates={rates}
       />
 
-      {/* Instagram-Style Story Highlights Bar */}
+      {/* Instagram-Style Story Highlights */}
       <StoryHighlights 
         onSelectStory={setSelectedStory} 
       />
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main className="flex-1">
         
         {/* Hero Section */}
@@ -163,57 +208,49 @@ export default function App() {
         />
 
         {/* Product Catalog Section */}
-        <section id="katalog" className="py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+        <section id="katalog" className="py-8 sm:py-14 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-7">
           
-          {/* Section Header & Filters */}
-          <div className="space-y-5">
+          {/* Section Header */}
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-euro-400 bg-euro-900/60 px-3 py-1 rounded-full border border-euro-800">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Stoktaki Hazır & Özel İthal Ürünler</span>
+            </div>
+            
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-euro-400 bg-euro-900/60 px-3 py-1 rounded-full border border-euro-800">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Stoktaki Hazır & Özel İthal Ürünler</span>
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display mt-2">
+                <h2 className="text-xl sm:text-3xl font-extrabold text-white font-display">
                   Seçkin Avrupa Koleksiyonu
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                  Orijinal Avrupa faturalı ürünler. Dolap & Gardrops güvencesiyle veya doğrudan WhatsApp üzerinden sipariş verebilirsiniz.
+                <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+                  Orijinal Avrupa faturalı koleksiyon figürleri, nadir vintage çantalar ve Almanya DM ürünleri.
                 </p>
               </div>
 
-              {/* Search Bar */}
-              <div className="relative w-full md:w-72">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                <input 
-                  type="text"
-                  placeholder="Ürün veya marka ara..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-euro-900/70 border border-euro-700/60 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-euro-400 transition"
+              {/* 4. Search Bar (Search Inputs with Chips) */}
+              <div className="w-full md:w-80">
+                <SearchBar 
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  inputRef={searchInputRef}
                 />
               </div>
             </div>
-
-            {/* Category Filter Pills (Horizontal Touch Scroll on Mobile) */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 shrink-0 snap-start active:scale-95 ${
-                    selectedCategory === cat.id 
-                      ? 'bg-euro-600 text-white shadow-lg shadow-euro-900/50 border border-euro-500' 
-                      : 'bg-euro-900/60 text-slate-300 hover:text-white border border-euro-800 hover:border-euro-700'
-                  }`}
-                >
-                  <span>{cat.label}</span>
-                </button>
-              ))}
-            </div>
           </div>
 
+          {/* 5. Filter & Sort Bar (Category Utility Bar - Sticky) */}
+          <FilterSortBar 
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            itemCount={sortedProducts.length}
+            mobileCols={mobileCols}
+            setMobileCols={setMobileCols}
+          />
+
           {/* Product Grid */}
-          {filteredProducts.length === 0 ? (
+          {sortedProducts.length === 0 ? (
             <div className="glass-card rounded-2xl p-10 text-center space-y-4 border border-euro-800/80">
               <p className="text-slate-400 text-sm">Aradığınız kriterlere uygun ürün bulunamadı.</p>
               <button 
@@ -224,8 +261,8 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {filteredProducts.map(product => (
+            <div className={`grid gap-2.5 sm:gap-6 ${mobileCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`}>
+              {sortedProducts.map(product => (
                 <ProductCard 
                   key={product.id}
                   product={product}
@@ -281,9 +318,9 @@ export default function App() {
       {/* Footer */}
       <Footer />
 
-      {/* Mobile Fixed App Bottom Bar */}
+      {/* 6. Bottom Tab Bar (Bottom Navigation Bar) */}
       <MobileBottomBar 
-        cartCount={cart.reduce((a, b) => a + b.quantity, 0)}
+        cartCount={cartTotalCount}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenWizard={() => setIsWizardOpen(true)}
         scrollToCatalog={scrollToCatalog}
@@ -297,7 +334,7 @@ export default function App() {
         onAction={handleStoryAction}
       />
 
-      {/* Product Detail Modal (Native Mobile Bottom Sheet) */}
+      {/* 7. Product Modal (With Sticky Buy Bar / Floating Action Bar) */}
       <ProductModal 
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}

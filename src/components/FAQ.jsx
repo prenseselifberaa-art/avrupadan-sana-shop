@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, HelpCircle, MessageCircle } from 'lucide-react';
-import { FAQ_ITEMS } from '../data/products';
+import { FAQ_ITEMS, WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from '../data/products';
 
 export default function FAQ() {
   const [openIdx, setOpenIdx] = useState(0);
@@ -61,13 +61,13 @@ export default function FAQ() {
             <p className="text-xs text-slate-400">Instagram veya WhatsApp üzerinden doğrudan danışmanımıza ulaşabilirsiniz.</p>
           </div>
           <a 
-            href="https://wa.me/?text=Merhaba%2C%20Avrupadan.Sana.Shop%20hakk%C4%B1nda%20bir%20sorum%20var."
+            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Merhaba! Avrupadan.Sana.Shop hakkında bir sorum var.')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition shrink-0"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>WhatsApp Destek Hattı</span>
+            <span>WhatsApp: {WHATSAPP_DISPLAY}</span>
           </a>
         </div>
 
