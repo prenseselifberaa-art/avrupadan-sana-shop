@@ -1,19 +1,18 @@
 import React from 'react';
 import { STORY_HIGHLIGHTS } from '../data/stories';
-import { Sparkles, ArrowRight } from 'lucide-react';
 
 export default function StoryHighlights({ onSelectStory }) {
   return (
-    <section className="py-4 border-b border-euro-800/40 bg-euro-950/50 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="w-full max-w-full overflow-hidden py-3 sm:py-4 border-b border-euro-800/40 bg-euro-950/60 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 w-full">
         
-        {/* Horizontal Scrollable Container */}
-        <div className="flex items-center gap-4 sm:gap-6 overflow-x-auto pb-2 scrollbar-none snap-x touch-pan-x">
+        {/* Horizontal Touch Scroll Container */}
+        <div className="flex items-center gap-3.5 sm:gap-6 overflow-x-auto pb-1 scrollbar-none snap-x touch-pan-x w-full">
           {STORY_HIGHLIGHTS.map((story) => (
             <button
               key={story.id}
               onClick={() => onSelectStory(story)}
-              className="flex flex-col items-center gap-1.5 shrink-0 snap-start group focus:outline-none transition active:scale-95"
+              className="flex flex-col items-center gap-1.5 shrink-0 snap-start group focus:outline-none transition active:scale-95 touch-manipulation"
             >
               {/* Outer Ring with Gradient */}
               <div className="relative p-[2px] rounded-full bg-gradient-to-tr from-euro-500 via-amber-400 to-euro-600 group-hover:scale-105 transition-transform duration-300 shadow-md shadow-black/40">
@@ -23,6 +22,7 @@ export default function StoryHighlights({ onSelectStory }) {
                       src={story.image} 
                       alt={story.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
+                      loading="lazy"
                     />
                     {/* Badge Emoji */}
                     <span className="absolute bottom-0 right-0 text-[10px] sm:text-xs bg-euro-950/90 rounded-full px-1 py-0.2 border border-euro-700/60 shadow">

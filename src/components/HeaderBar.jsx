@@ -12,12 +12,12 @@ export default function HeaderBar({
   onFocusSearch 
 }) {
   return (
-    <header className="sticky top-0 z-40 w-full glass-panel border-b border-euro-800/60 backdrop-blur-xl shadow-lg shadow-black/20">
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-15 sm:h-18 gap-2">
+    <header className="sticky top-0 z-40 w-full max-w-full glass-panel border-b border-euro-800/60 backdrop-blur-xl shadow-lg shadow-black/20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-15 sm:h-18 gap-1 sm:gap-2">
           
           {/* Left: Mobile Drawer Trigger + Brand Logo */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             {/* Hamburger Button for Mobile & Tablet only */}
             <button
               onClick={onOpenDrawer}
@@ -28,8 +28,8 @@ export default function HeaderBar({
             </button>
 
             {/* Brand Logo & Title */}
-            <a href="#" className="flex items-center gap-2 group shrink-0">
-              <div className="h-9 sm:h-11 w-auto bg-white rounded-xl p-1 shadow-md border border-slate-300/40 group-hover:scale-105 transition duration-300 flex items-center justify-center shrink-0">
+            <a href="#" className="flex items-center gap-1.5 sm:gap-2.5 group shrink-0">
+              <div className="h-9 sm:h-11 w-auto bg-white rounded-xl p-1 shadow-md border border-slate-300/50 group-hover:scale-105 transition duration-300 flex items-center justify-center shrink-0">
                 <img 
                   src="/logo.jpg" 
                   alt="Avrupadan.Sana.Shop Logo" 
@@ -39,8 +39,11 @@ export default function HeaderBar({
               </div>
               
               <div className="flex flex-col">
-                <span className="text-sm sm:text-lg font-extrabold tracking-tight text-white font-display flex items-center leading-none">
-                  Avrupadan<span className="text-euro-400">.Sana</span><span className="text-amber-400">.Shop</span>
+                <span className="text-xs sm:text-lg font-extrabold tracking-tight text-white font-display flex items-center leading-none">
+                  <span className="hidden sm:inline">Avrupadan.</span>
+                  <span className="sm:hidden">A.</span>
+                  <span className="text-euro-400">Sana</span>
+                  <span className="text-amber-400">.Shop</span>
                 </span>
                 <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium tracking-wide hidden sm:inline mt-0.5">
                   Avrupa İthalat & Kişisel Alışveriş
@@ -82,9 +85,9 @@ export default function HeaderBar({
           </nav>
 
           {/* Right Controls: Currency Switcher, Instagram, Search, Cart */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             
-            {/* Currency Selector (Compact Segmented Control) */}
+            {/* Currency Selector (Ultra Compact) */}
             <div className="flex items-center bg-[#070e1b] rounded-lg p-0.5 border border-euro-700/60 shadow-inner">
               {[
                 { id: 'TRY', symbol: '₺' },
@@ -95,7 +98,7 @@ export default function HeaderBar({
                   key={c.id}
                   onClick={() => setCurrency(c.id)}
                   title={`${c.id} para birimine geç`}
-                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[11px] sm:text-xs font-bold transition ${
+                  className={`px-1.5 sm:px-2 py-0.5 rounded text-[11px] font-bold transition ${
                     currency === c.id 
                       ? 'bg-euro-600 text-white shadow' 
                       : 'text-slate-400 hover:text-white'
@@ -106,7 +109,7 @@ export default function HeaderBar({
               ))}
             </div>
 
-            {/* Instagram Quick Link (Icon button on tablet/desktop) */}
+            {/* Instagram Quick Link (Tablet/Desktop) */}
             <a 
               href="https://www.instagram.com/avrupadan.sana.shop" 
               target="_blank" 
@@ -121,7 +124,7 @@ export default function HeaderBar({
             {/* Search Trigger Button */}
             <button
               onClick={onFocusSearch}
-              className="p-1.5 sm:p-2 rounded-lg text-slate-200 hover:text-white bg-euro-900/80 border border-euro-700/60 hover:border-euro-500 hover:bg-euro-800 transition active:scale-95"
+              className="p-1.5 rounded-lg text-slate-200 hover:text-white bg-euro-900/80 border border-euro-700/60 hover:border-euro-500 hover:bg-euro-800 transition active:scale-95"
               aria-label="Katalogda Arama Yap"
               title="Arama Yap"
             >
@@ -131,13 +134,13 @@ export default function HeaderBar({
             {/* Cart Button */}
             <button 
               onClick={onOpenCart}
-              className="relative flex items-center gap-1.5 bg-gradient-to-r from-euro-600 to-euro-700 hover:from-euro-500 hover:to-euro-600 text-white px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-euro-950/60 transition active:scale-95 border border-euro-500/40"
+              className="relative flex items-center gap-1 bg-gradient-to-r from-euro-600 to-euro-700 hover:from-euro-500 hover:to-euro-600 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold shadow-md shadow-euro-950/60 transition active:scale-95 border border-euro-500/40"
               aria-label="Sepeti Görüntüle"
             >
               <ShoppingBag className="w-4 h-4 text-white" />
               <span className="hidden sm:inline font-bold">Sepet</span>
               {cartCount > 0 && (
-                <span className="bg-amber-400 text-euro-950 text-[10px] font-black min-w-[17px] h-[17px] px-1 rounded-full flex items-center justify-center shadow">
+                <span className="bg-amber-400 text-euro-950 text-[10px] font-black min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow">
                   {cartCount}
                 </span>
               )}

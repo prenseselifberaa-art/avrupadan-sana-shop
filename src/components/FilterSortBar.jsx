@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpDown, Grid, LayoutGrid, Check } from 'lucide-react';
+import { ArrowUpDown, Grid, LayoutGrid } from 'lucide-react';
 import { CATEGORIES } from '../data/products';
 
 export default function FilterSortBar({ 
@@ -12,11 +12,11 @@ export default function FilterSortBar({
   setMobileCols
 }) {
   return (
-    <div className="sticky top-16 sm:top-[76px] z-30 bg-[#070e1b]/95 backdrop-blur-xl border-y border-euro-800/70 py-2.5 px-3 sm:px-6 shadow-md">
-      <div className="max-w-7xl mx-auto flex flex-col gap-2.5">
+    <div className="sticky top-15 sm:top-[74px] z-30 w-full max-w-full overflow-hidden bg-[#060e1b]/95 backdrop-blur-xl border-y border-euro-800/70 py-2 sm:py-2.5 px-3 sm:px-6 shadow-md">
+      <div className="max-w-7xl mx-auto flex flex-col gap-2 w-full">
         
-        {/* Row 1: Horizontal Category Slider (Smooth Touch Scrolling) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none snap-x touch-pan-x">
+        {/* Row 1: Horizontal Category Slider (Smooth Touch Scrolling, strictly clipped) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none snap-x touch-pan-x w-full">
           {CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat.id;
             return (
@@ -35,41 +35,41 @@ export default function FilterSortBar({
           })}
         </div>
 
-        {/* Row 2: Product Counter, Sort Filter & Mobile Grid Toggle */}
-        <div className="flex items-center justify-between text-xs text-slate-300 pt-1.5 border-t border-euro-850/60">
+        {/* Row 2: Product Counter, Sort Filter & Mobile Grid Toggle (Fits in any width, no overflow) */}
+        <div className="flex items-center justify-between text-xs text-slate-300 pt-1.5 border-t border-euro-850/60 gap-1.5 w-full">
           
           {/* Counter Badge */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span className="font-bold text-white text-xs">
-              {itemCount} <span className="font-normal text-slate-400">Avrupa Ürünü</span>
+            <span className="font-bold text-white text-xs whitespace-nowrap">
+              {itemCount} <span className="font-normal text-slate-400 hidden xs:inline">Ürün</span>
             </span>
           </div>
 
           {/* Right Tools: Sort Selector & Mobile Col Switcher */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
             {/* Sort Selector Dropdown */}
-            <div className="flex items-center gap-1.5 bg-[#0a1527] rounded-xl px-2.5 py-1 border border-euro-700/60 hover:border-euro-500/60 transition shadow-inner">
-              <ArrowUpDown className="w-3.5 h-3.5 text-euro-400 shrink-0" />
+            <div className="flex items-center gap-1 bg-[#091528] rounded-lg px-2 py-1 border border-euro-700/60 transition shadow-inner">
+              <ArrowUpDown className="w-3 h-3 text-euro-400 shrink-0" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer pr-1"
+                className="bg-transparent text-slate-200 text-[11px] sm:text-xs font-semibold focus:outline-none cursor-pointer pr-0.5"
                 aria-label="Sıralama Seçimi"
               >
                 <option value="featured" className="bg-[#0b192c] text-white">Öne Çıkanlar</option>
-                <option value="price-asc" className="bg-[#0b192c] text-white">Fiyat: Düşükten Yükseğe</option>
-                <option value="price-desc" className="bg-[#0b192c] text-white">Fiyat: Yüksekten Düşüğe</option>
-                <option value="rare" className="bg-[#0b192c] text-white">Nadir Koleksiyon</option>
+                <option value="price-asc" className="bg-[#0b192c] text-white">Fiyat Artan</option>
+                <option value="price-desc" className="bg-[#0b192c] text-white">Fiyat Azalan</option>
+                <option value="rare" className="bg-[#0b192c] text-white">Nadir Parçalar</option>
               </select>
             </div>
 
             {/* Mobile View Toggle: 1-Col vs 2-Col */}
-            <div className="sm:hidden flex items-center bg-[#0a1527] rounded-xl p-0.5 border border-euro-700/60 shadow-inner">
+            <div className="sm:hidden flex items-center bg-[#091528] rounded-lg p-0.5 border border-euro-700/60 shadow-inner">
               <button
                 onClick={() => setMobileCols(1)}
-                className={`p-1.5 rounded-lg transition ${
+                className={`p-1 rounded transition ${
                   mobileCols === 1 
                     ? 'bg-euro-600 text-white shadow' 
                     : 'text-slate-400 hover:text-slate-200'
@@ -81,7 +81,7 @@ export default function FilterSortBar({
               </button>
               <button
                 onClick={() => setMobileCols(2)}
-                className={`p-1.5 rounded-lg transition ${
+                className={`p-1 rounded transition ${
                   mobileCols === 2 
                     ? 'bg-euro-600 text-white shadow' 
                     : 'text-slate-400 hover:text-slate-200'

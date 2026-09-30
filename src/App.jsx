@@ -151,7 +151,7 @@ export default function App() {
   const cartTotalCount = cart.reduce((a, b) => a + b.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-[#070e1b] text-slate-100 flex flex-col font-sans pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#050b14] text-slate-100 flex flex-col font-sans pb-20 md:pb-0 w-full max-w-full overflow-x-hidden">
       
       {/* Toast Notification */}
       {toastMessage && (
@@ -197,7 +197,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         
         {/* Hero Section */}
         <Hero 
@@ -208,7 +208,7 @@ export default function App() {
         />
 
         {/* Product Catalog Section */}
-        <section id="katalog" className="py-8 sm:py-14 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-5 sm:space-y-7">
+        <section id="katalog" className="py-6 sm:py-12 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-4 sm:space-y-6 w-full max-w-full overflow-hidden">
           
           {/* Section Header */}
           <div className="space-y-3">
@@ -261,7 +261,7 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <div className={`grid gap-2.5 sm:gap-6 ${mobileCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`}>
+            <div className={`grid gap-2.5 sm:gap-6 ${mobileCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full`}>
               {sortedProducts.map(product => (
                 <ProductCard 
                   key={product.id}
@@ -271,6 +271,7 @@ export default function App() {
                   onSelectProduct={setSelectedProduct}
                   onAddToCart={handleAddToCart}
                   onOpenWizard={() => setIsWizardOpen(true)}
+                  mobileCols={mobileCols}
                 />
               ))}
             </div>

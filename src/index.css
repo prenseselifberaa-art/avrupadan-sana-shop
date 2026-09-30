@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-euro-950: #060e1a;
-  --color-euro-900: #0b192c;
-  --color-euro-850: #0f243e;
-  --color-euro-800: #143153;
-  --color-euro-750: #193d68;
-  --color-euro-700: #1d4576;
+  --color-euro-950: #050b14;
+  --color-euro-900: #0a1526;
+  --color-euro-850: #0e1e36;
+  --color-euro-800: #142a4a;
+  --color-euro-750: #1a3760;
+  --color-euro-700: #204576;
   --color-euro-600: #2563eb;
   --color-euro-500: #3b82f6;
   --color-euro-400: #60a5fa;
@@ -27,16 +27,28 @@
 }
 
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    background-color: #060d19;
+    background-color: #050b14;
     color: #e2e8f0;
     overflow-x: hidden;
+    max-width: 100%;
+    width: 100%;
+    position: relative;
+    margin: 0;
+    padding: 0;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -60,17 +72,17 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #081220;
+  background: #060d19;
 }
 ::-webkit-scrollbar-thumb {
-  background: #173254;
+  background: #142a4a;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #2563eb;
 }
 
-/* Hide scrollbars for horizontal carousels */
+/* Hide scrollbars for touch carousels */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
@@ -79,16 +91,16 @@
   scrollbar-width: none;
 }
 
-/* Premium Glassmorphism */
+/* Luxury Glassmorphism */
 .glass-panel {
-  background: rgba(10, 21, 39, 0.88);
+  background: rgba(9, 19, 36, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card {
-  background: rgba(11, 23, 44, 0.72);
+  background: rgba(10, 22, 42, 0.78);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -96,19 +108,19 @@
 }
 
 .glass-card:hover {
-  border-color: rgba(96, 165, 250, 0.35);
-  box-shadow: 0 10px 25px -5px rgba(6, 14, 26, 0.7), 0 0 15px -3px rgba(37, 99, 235, 0.15);
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 12px 28px -6px rgba(3, 8, 16, 0.75), 0 0 16px -3px rgba(37, 99, 235, 0.2);
 }
 
 /* Luxury Glow utilities */
 .glow-euro {
-  box-shadow: 0 0 30px -5px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 0 25px -4px rgba(37, 99, 235, 0.45);
 }
 
 .glow-amber {
-  box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.4);
 }
 
 .glow-emerald {
-  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.4);
 }
