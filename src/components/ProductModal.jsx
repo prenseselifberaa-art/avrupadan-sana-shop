@@ -76,29 +76,43 @@ export default function ProductModal({
             </div>
 
             {/* Price Box */}
-            <div className="p-3 rounded-xl bg-euro-900/70 border border-euro-800 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] text-slate-400 block font-medium">Satış Fiyatı</span>
-                {product.isCustomQuote ? (
-                  <span className="text-base sm:text-lg font-bold text-amber-400">Özel Teklif</span>
-                ) : (
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xl sm:text-2xl font-black text-amber-400 font-display">
-                      {formattedMainPrice}
-                    </span>
-                    <span className="text-xs text-slate-400 font-mono">
-                      {currency === 'TRY' ? `(~ €${convertFromTRY(product.priceTRY, 'EUR', rates)})` : `(~ ${product.priceTRY.toLocaleString('tr-TR')} ₺)`}
-                    </span>
-                  </div>
-                )}
+            <div className="p-3.5 rounded-xl bg-euro-900/70 border border-euro-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-medium">Satış Fiyatı</span>
+                  {product.isCustomQuote ? (
+                    <span className="text-base sm:text-lg font-bold text-amber-400">Özel Teklif</span>
+                  ) : (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xl sm:text-2xl font-black text-amber-400 font-display">
+                        {formattedMainPrice}
+                      </span>
+                      <span className="text-xs text-slate-400 font-mono">
+                        {currency === 'TRY' ? `(~ €${convertFromTRY(product.priceTRY, 'EUR', rates)})` : `(~ ${product.priceTRY.toLocaleString('tr-TR')} ₺)`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <span className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  Orijinal Avrupa
+                </span>
               </div>
-              <span className="text-[11px] font-bold px-2 py-1 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                Orijinal Avrupa
-              </span>
+
+              {/* Cross-platform price comparison if listed on both */}
+              {product.gardropsPrice && product.dolapPrice && product.gardropsPrice !== product.dolapPrice && (
+                <div className="pt-2 border-t border-euro-800/60 flex items-center justify-between text-[11px] text-slate-300">
+                  <span className="text-slate-400">Platform Fiyatları:</span>
+                  <div className="flex items-center gap-2 font-mono">
+                    <span className="text-pink-300">Gardrops: {product.gardropsPrice.toLocaleString('tr-TR')} ₺</span>
+                    <span className="text-slate-500">&bull;</span>
+                    <span className="text-emerald-300">Dolap: {product.dolapPrice.toLocaleString('tr-TR')} ₺</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Description */}
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-line">
               {product.description}
             </p>
 
@@ -120,35 +134,39 @@ export default function ProductModal({
             )}
 
             {/* Platform Direct Buy Links */}
-            <div className="space-y-1.5 pt-2 border-t border-euro-800/60">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Platform Güvenceli Alışveriş:
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {product.gardropsUrl && (
-                  <a 
-                    href={product.gardropsUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-pink-950/50 hover:bg-pink-900/60 text-pink-300 font-bold text-xs border border-pink-700/40 transition active:scale-95"
-                  >
-                    <span>Gardrops</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-                {product.dolapUrl && (
-                  <a 
-                    href={product.dolapUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 font-bold text-xs border border-emerald-700/40 transition active:scale-95"
-                  >
-                    <span>Dolap</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
+            {(product.gardropsUrl || product.dolapUrl) && (
+              <div className="space-y-1.5 pt-2 border-t border-euro-800/60">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Platform Güvenceli Alışveriş Linkleri:
+                </span>
+                <div className={`grid ${product.gardropsUrl && product.dolapUrl ? 'grid-cols-2' : 'grid-cols-1'} gap-2`}>
+                  {product.gardropsUrl && (
+                    <a 
+                      href={product.gardropsUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-pink-950/60 hover:bg-pink-900/70 text-pink-300 font-bold text-xs border border-pink-700/50 transition active:scale-95 shadow-sm"
+                    >
+                      <span>Gardrops'ta Aç</span>
+                      {product.gardropsPrice && <span className="opacity-80 font-mono text-[10px]">({product.gardropsPrice.toLocaleString('tr-TR')} ₺)</span>}
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {product.dolapUrl && (
+                    <a 
+                      href={product.dolapUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/70 text-emerald-300 font-bold text-xs border border-emerald-700/50 transition active:scale-95 shadow-sm"
+                    >
+                      <span>Dolap'ta Aç</span>
+                      {product.dolapPrice && <span className="opacity-80 font-mono text-[10px]">({product.dolapPrice.toLocaleString('tr-TR')} ₺)</span>}
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Trust badge */}
             <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-950/30 p-2 rounded-lg border border-emerald-800/30">
