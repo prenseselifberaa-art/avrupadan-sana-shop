@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, CheckCircle, ExternalLink, ShoppingBag, MessageCircle, ShieldCheck, Sparkles, Plane } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, CheckCircle, ExternalLink, ShoppingBag, MessageCircle, ShieldCheck, Sparkles, Plane, Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { convertFromTRY, formatCurrency } from '../utils/currency';
 import { WHATSAPP_NUMBER } from '../data/products';
 
@@ -7,11 +7,22 @@ export default function ProductModal({
   product, 
   onClose, 
   currency, 
-  rates,
-  onAddToCart,
-  onOpenWizard
+  rates, 
+  onAddToCart, 
+  onOpenWizard,
+  isFavorite = false,
+  onToggleFavorite,
+  onShowToast
 }) {
   if (!product) return null;
+
+  const images = (product.images && product.images.length > 0) ? product.images : [product.image];
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  // Reset active image index when product changes
+  useEffect(() => {
+    setActiveIdx(0);
+  }, [product?.id]);
 
   const convertedPrice = convertFromTRY(product.priceTRY, currency, rates);
   const formattedMainPrice = formatCurrency(convertedPrice, currency);
@@ -20,6 +31,25 @@ export default function ProductModal({
     `Merhaba! Avrupadan.Sana.Shop üzerinden "${product.title}" (${product.priceTRY > 0 ? product.priceTRY.toLocaleString('tr-TR') + ' TL' : 'Özel Fiyat'}) ürününü satın almak ve detayları öğrenmek istiyorum.`
   );
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
+
+  const handleShare = (e) => {
+    e.stopPropagation();
+    const shareText = `${product.title} - Avrupadan Sana Shop\n${window.location.origin}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareText);
+      if (onShowToast) onShowToast('Ürün linki panoya kopyalandı!');
+    }
+  };
+
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    setActiveIdx((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    setActiveIdx((prev) => (prev + 1) % images.length);
+  };
 
   return (
     <div 
@@ -33,32 +63,112 @@ export default function ProductModal({
         {/* Mobile Swipe Handle */}
         <div className="sm:hidden w-12 h-1.5 bg-slate-600 rounded-full mx-auto my-2.5 shrink-0"></div>
 
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 rounded-full bg-euro-950/80 text-slate-300 hover:text-white border border-euro-800 transition"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Top Right Action Buttons: Share, Favorite, Close */}
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 flex items-center gap-1.5">
+          <button
+            onClick={handleShare}
+            className="p-2 rounded-full bg-euro-950/80 text-slate-300 hover:text-white border border-euro-800 transition active:scale-95 shadow-md"
+            title="Ürünü Paylaş"
+            aria-label="Ürünü Paylaş"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onToggleFavorite) onToggleFavorite(product.id);
+            }}
+            className={`p-2 rounded-full border transition active:scale-95 shadow-md ${
+              isFavorite 
+                ? 'bg-rose-500 text-white border-rose-400' 
+                : 'bg-euro-950/80 text-slate-300 hover:text-white border-euro-800'
+            }`}
+            title={isFavorite ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+            aria-label="Favorilere Ekle"
+          >
+            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+          </button>
 
-        {/* Product Image Section */}
-        <div className="w-full md:w-1/2 relative bg-euro-950 aspect-[4/3] sm:aspect-square md:aspect-auto shrink-0 max-h-64 sm:max-h-none">
-          <img 
-            src={product.image} 
-            alt={product.title} 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-            <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-euro-900/90 text-white border border-euro-700 backdrop-blur-md">
-              {product.condition}
-            </span>
-            {product.isRare && (
-              <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-euro-950 flex items-center gap-1 shadow-md">
-                <Sparkles className="w-3 h-3" />
-                Nadir Edisyon
-              </span>
+          <button 
+            onClick={onClose}
+            className="p-2 rounded-full bg-euro-950/80 text-slate-300 hover:text-white border border-euro-800 transition active:scale-95 shadow-md"
+            aria-label="Kapat"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Product Image Section with Multi-Image Gallery */}
+        <div className="w-full md:w-1/2 flex flex-col shrink-0 bg-euro-950">
+          
+          {/* Main Active Image Viewport */}
+          <div className="relative aspect-[4/3] sm:aspect-square md:aspect-auto md:h-96 w-full overflow-hidden bg-euro-950">
+            <img 
+              src={images[activeIdx] || product.image} 
+              alt={`${product.title} - Görsel ${activeIdx + 1}`} 
+              className="w-full h-full object-cover transition-opacity duration-300"
+            />
+
+            {/* Left / Right Navigation Chevrons */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={handlePrevImage}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-euro-950/80 hover:bg-euro-900 text-white border border-euro-700/60 shadow-lg active:scale-90 transition z-10"
+                  aria-label="Önceki Görsel"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleNextImage}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-euro-950/80 hover:bg-euro-900 text-white border border-euro-700/60 shadow-lg active:scale-90 transition z-10"
+                  aria-label="Sonraki Görsel"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                
+                {/* Counter Pill */}
+                <div className="absolute top-3 left-3 bg-euro-950/85 text-slate-200 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-euro-700/70 backdrop-blur-md shadow-md z-10">
+                  {activeIdx + 1} / {images.length}
+                </div>
+              </>
             )}
+
+            {/* Bottom Condition Badges on Image */}
+            <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
+              <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-euro-900/90 text-white border border-euro-700 backdrop-blur-md">
+                {product.condition}
+              </span>
+              {product.isRare && (
+                <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500 text-euro-950 flex items-center gap-1 shadow-md">
+                  <Sparkles className="w-3 h-3" />
+                  Nadir Edisyon
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Interactive Thumbnail Strip */}
+          {images.length > 1 && (
+            <div className="flex items-center gap-1.5 p-2 bg-[#050b14] overflow-x-auto scrollbar-none border-t border-euro-800/80">
+              {images.map((imgUrl, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveIdx(i)}
+                  className={`relative w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition active:scale-95 ${
+                    activeIdx === i 
+                      ? 'border-amber-400 scale-105 shadow-md shadow-amber-400/20' 
+                      : 'border-euro-800/80 opacity-60 hover:opacity-100'
+                  }`}
+                  aria-label={`Görsel ${i + 1}`}
+                >
+                  <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+
         </div>
 
         {/* Product Details Section */}

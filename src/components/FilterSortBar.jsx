@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpDown, Grid, LayoutGrid } from 'lucide-react';
+import { ArrowUpDown, Grid, LayoutGrid, Heart } from 'lucide-react';
 import { CATEGORIES } from '../data/products';
 
 export default function FilterSortBar({ 
@@ -9,7 +9,8 @@ export default function FilterSortBar({
   setSortBy, 
   itemCount,
   mobileCols,
-  setMobileCols
+  setMobileCols,
+  favoritesCount = 0
 }) {
   return (
     <div className="sticky top-15 sm:top-[74px] z-30 w-full max-w-full overflow-hidden bg-[#060e1b]/95 backdrop-blur-xl border-y border-euro-800/70 py-2 sm:py-2.5 px-3 sm:px-6 shadow-md">
@@ -33,6 +34,26 @@ export default function FilterSortBar({
               </button>
             );
           })}
+
+          {/* Favorilerim Special Filter Button */}
+          <button
+            onClick={() => onSelectCategory('favorites')}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition shrink-0 snap-start flex items-center gap-1.5 active:scale-95 touch-manipulation ${
+              selectedCategory === 'favorites'
+                ? 'bg-rose-600 text-white shadow-md shadow-rose-950/60 border border-rose-400'
+                : 'bg-euro-900/60 hover:bg-euro-800/80 text-rose-300 hover:text-white border border-rose-900/40'
+            }`}
+          >
+            <Heart className={`w-3.5 h-3.5 ${selectedCategory === 'favorites' ? 'fill-current' : ''}`} />
+            <span>Favorilerim</span>
+            {favoritesCount > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                selectedCategory === 'favorites' ? 'bg-white text-rose-600' : 'bg-rose-500/30 text-rose-300'
+              }`}>
+                {favoritesCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Row 2: Product Counter, Sort Filter & Mobile Grid Toggle (Fits in any width, no overflow) */}

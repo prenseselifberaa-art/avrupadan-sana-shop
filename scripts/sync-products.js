@@ -168,6 +168,7 @@ function parseGardrops(html) {
         title,
         priceTRY,
         image: item.productImg || '',
+        images: item.productImg ? [item.productImg] : [],
         condition,
         gardropsUrl,
         freeShipping: !!item.freeShipping
@@ -202,6 +203,7 @@ function parseGardrops(html) {
       title,
       priceTRY,
       image,
+      images: image ? [image] : [],
       condition: 'Yeni & Etiketli',
       gardropsUrl: `https://www.gardrops.com${relUrl}`,
       freeShipping: true
@@ -223,7 +225,9 @@ function parseDolap(html) {
       const priceTRY = parseInt((item.price || '').replace(/[^\d]/g, ''), 10) || null;
       const slug = slugify(item.title);
       const dolapUrl = `https://dolap.com/urun/${slug}-avrupadansana1-${item.id}`;
-      const image = item.images?.[0]?.path || item.thumbnailImage?.path || '';
+      const images = (item.images || []).map(img => img.path).filter(Boolean);
+      if (images.length === 0 && item.thumbnailImage?.path) images.push(item.thumbnailImage.path);
+      const image = images[0] || '';
       
       let condition = 'Yeni & Etiketli';
       if (item.condition === 'LIKE_NEW') condition = 'Çok Az Kullanılmış / Kusursuz';
@@ -236,6 +240,7 @@ function parseDolap(html) {
         title: item.title,
         priceTRY,
         image,
+        images,
         condition,
         dolapUrl,
         description: item.description || ''
@@ -267,6 +272,7 @@ function parseDolap(html) {
         title,
         priceTRY: null,
         image,
+        images: image ? [image] : [],
         condition: 'Yeni & Etiketli',
         dolapUrl: `https://dolap.com${relUrl}`
       });
@@ -295,6 +301,7 @@ export async function syncAllProducts() {
   gardropsProducts.forEach(gp => {
     const key = getProductKey(gp.title);
     const { brand, category, isRare } = categorizeProduct(gp.title);
+    const images = gp.images || (gp.image ? [gp.image] : []);
 
     mergedMap.set(key, {
       id: gp.id,
@@ -309,6 +316,7 @@ export async function syncAllProducts() {
       gardropsUrl: gp.gardropsUrl,
       dolapUrl: null,
       image: gp.image,
+      images,
       condition: gp.condition,
       description: `Avrupa koleksiyonundan %100 orijinal ve faturalı ürün. Gardrops alıcı güvencesiyle sigortalı kargo ile gönderilir veya WhatsApp üzerinden doğrudan sipariş verilebilir.`,
       specs: [
@@ -323,13 +331,18 @@ export async function syncAllProducts() {
   dolapProducts.forEach(dp => {
     const key = getProductKey(dp.title);
     const { brand, category, isRare } = categorizeProduct(dp.title);
+    const dpImages = dp.images || (dp.image ? [dp.image] : []);
 
     if (mergedMap.has(key)) {
       const existing = mergedMap.get(key);
       existing.dolapUrl = dp.dolapUrl;
       existing.dolapPrice = dp.priceTRY;
       if (dp.description) existing.description = dp.description;
-      if (!existing.image && dp.image) existing.image = dp.image;
+      
+      // Combine unique images
+      const combinedImages = Array.from(new Set([...(existing.images || []), ...dpImages]));
+      existing.images = combinedImages;
+      if (!existing.image && combinedImages[0]) existing.image = combinedImages[0];
       
       // Best price displayed on card
       if (dp.priceTRY && (!existing.priceTRY || dp.priceTRY < existing.priceTRY)) {
@@ -350,6 +363,7 @@ export async function syncAllProducts() {
         dolapUrl: dp.dolapUrl,
         gardropsUrl: null,
         image: dp.image,
+        images: dpImages,
         condition: dp.condition,
         description: dp.description || `Avrupa'dan özenle seçilmiş orijinal ürün. Dolap güvencesi veya WhatsApp hattı üzerinden hemen sipariş oluşturabilirsiniz.`,
         specs: [
@@ -374,7 +388,9 @@ export async function syncAllProducts() {
     isCustomQuote: true,
     condition: 'Özel Talep / Sıfır İthalat',
     image: 'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?auto=format&fit=crop&w=600&q=80',
+    images: ['https://images.unsplash.com/photo-1576426863848-c21f53c60b19?auto=format&fit=crop&w=600&q=80'],
     description: 'Almanya DM (Drogerie Markt), Rossmann, Amazon.de ve Avrupa eczanelerinden dilediğiniz vitamin, Balea cilt bakım veya kozmetik ürünlerini canlı piyasa kuruyla doğrudan adresinize temin ediyoruz.',
+
     isRare: false,
     dolapUrl: 'https://dolap.com/profil/avrupadansana1',
     gardropsUrl: 'https://www.gardrops.com/avrupadansana1',

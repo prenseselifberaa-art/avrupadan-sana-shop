@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Eye, ExternalLink, Sparkles } from 'lucide-react';
+import { ShoppingBag, Eye, ExternalLink, Sparkles, Heart, Images } from 'lucide-react';
 import { convertFromTRY, formatCurrency } from '../utils/currency';
 
 export default function ProductCard({ 
@@ -9,7 +9,9 @@ export default function ProductCard({
   onSelectProduct, 
   onAddToCart,
   onOpenWizard,
-  mobileCols = 2
+  mobileCols = 2,
+  isFavorite = false,
+  onToggleFavorite
 }) {
   const isCustom = product.isCustomQuote;
   const convertedPrice = convertFromTRY(product.priceTRY, currency, rates);
@@ -42,12 +44,36 @@ export default function ProductCard({
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-euro-950/90 text-slate-200 border border-euro-700/60 backdrop-blur-md shadow-sm">
             {product.condition}
           </span>
-          {product.isRare && (
-            <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-euro-950 uppercase tracking-wider flex items-center gap-1 shadow-md">
-              <Sparkles className="w-2.5 h-2.5" />
-              <span>Nadir</span>
-            </span>
-          )}
+          
+          <div className="flex items-center gap-1 pointer-events-auto">
+            {product.images && product.images.length > 1 && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-euro-950/85 text-slate-300 border border-euro-700/60 backdrop-blur-md flex items-center gap-1 shadow-sm">
+                <Images className="w-2.5 h-2.5 text-euro-400" />
+                <span>{product.images.length}</span>
+              </span>
+            )}
+            {product.isRare && (
+              <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-euro-950 uppercase tracking-wider flex items-center gap-1 shadow-md">
+                <Sparkles className="w-2.5 h-2.5" />
+                <span>Nadir</span>
+              </span>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onToggleFavorite) onToggleFavorite(product.id);
+              }}
+              className={`p-1.5 rounded-full backdrop-blur-md border transition active:scale-90 shadow-md ${
+                isFavorite 
+                  ? 'bg-rose-500 text-white border-rose-400' 
+                  : 'bg-euro-950/80 text-slate-300 hover:text-white border-euro-700/60 hover:bg-euro-900'
+              }`}
+              title={isFavorite ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+              aria-label="Favorilere Ekle"
+            >
+              <Heart className={`w-3 h-3 ${isFavorite ? 'fill-current' : ''}`} />
+            </button>
+          </div>
         </div>
 
         {/* Brand Pill on image bottom */}

@@ -17,7 +17,7 @@ import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import { CATEGORIES, PRODUCTS } from './data/products';
 import { fetchLiveRates } from './utils/currency';
-import { Sparkles, Plane, Check, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Sparkles, Plane, Check, ArrowRight, ShieldCheck, Heart, ArrowUp } from 'lucide-react';
 
 export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -31,10 +31,11 @@ export default function App() {
   const [sortBy, setSortBy] = useState('featured');
   const [mobileCols, setMobileCols] = useState(2);
   const [toastMessage, setToastMessage] = useState(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const searchInputRef = useRef(null);
 
-  // Live Exchange Rates
+  // Live Exchange Rates - Fetches immediately & polls every 60 seconds
   const [rates, setRates] = useState({
     EUR: 55.60,
     USD: 49.00,
@@ -46,7 +47,46 @@ export default function App() {
     fetchLiveRates().then(data => {
       if (data) setRates(data);
     });
+
+    const interval = setInterval(() => {
+      fetchLiveRates().then(data => {
+        if (data) setRates(data);
+      });
+    }, 60000); // 60s live poll
+
+    return () => clearInterval(interval);
   }, []);
+
+  // Scroll to top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Favorites (Wishlist) State with localStorage
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      const saved = localStorage.getItem('avrupa_shop_favs');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const toggleFavorite = (productId) => {
+    setFavorites(prev => {
+      const isFav = prev.includes(productId);
+      const next = isFav ? prev.filter(id => id !== productId) : [...prev, productId];
+      try {
+        localStorage.setItem('avrupa_shop_favs', JSON.stringify(next));
+      } catch (e) {}
+      showToast(isFav ? 'Ürün favorilerden çıkarıldı' : '❤️ Ürün favorilere eklendi!');
+      return next;
+    });
+  };
 
   // Cart State with localStorage persistence
   const [cart, setCart] = useState(() => {
@@ -133,7 +173,11 @@ export default function App() {
 
   // Filter & Sort Products
   const filteredProducts = PRODUCTS.filter(p => {
-    const matchesCat = selectedCategory === 'all' || p.category === selectedCategory;
+    const matchesCat = 
+      selectedCategory === 'all' ? true :
+      selectedCategory === 'favorites' ? favorites.includes(p.id) :
+      p.category === selectedCategory;
+
     const matchesSearch = 
       p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -161,6 +205,18 @@ export default function App() {
           </div>
           <span>{toastMessage}</span>
         </div>
+      )}
+
+      {/* Floating Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-22 md:bottom-8 right-4 sm:right-6 z-40 p-3 rounded-full bg-euro-900/95 text-euro-400 hover:text-white border border-euro-600/70 backdrop-blur-xl shadow-2xl active:scale-95 transition"
+          title="Sayfa Başına Çık"
+          aria-label="Sayfa Başına Çık"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
       )}
 
       {/* 1. Announcement Bar (Promo / Live Currency Ticker) */}
@@ -247,18 +303,39 @@ export default function App() {
             itemCount={sortedProducts.length}
             mobileCols={mobileCols}
             setMobileCols={setMobileCols}
+            favoritesCount={favorites.length}
           />
 
           {/* Product Grid */}
           {sortedProducts.length === 0 ? (
             <div className="glass-card rounded-2xl p-10 text-center space-y-4 border border-euro-800/80">
-              <p className="text-slate-400 text-sm">Aradığınız kriterlere uygun ürün bulunamadı.</p>
-              <button 
-                onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-                className="text-xs font-bold text-euro-400 hover:underline"
-              >
-                Filtreleri Temizle
-              </button>
+              {selectedCategory === 'favorites' ? (
+                <>
+                  <div className="w-12 h-12 rounded-full bg-rose-950/60 text-rose-400 border border-rose-800/60 flex items-center justify-center mx-auto">
+                    <Heart className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Henüz Favori Ürününüz Yok</h3>
+                  <p className="text-slate-400 text-xs max-w-sm mx-auto">
+                    Beğendiğiniz ürünlerin üzerindeki kalp ikonuna tıklayarak favorilerinize ekleyebilir, daha sonra kolayca inceleyebilirsiniz.
+                  </p>
+                  <button 
+                    onClick={() => setSelectedCategory('all')}
+                    className="text-xs font-bold text-euro-400 hover:text-euro-300 underline"
+                  >
+                    Tüm Ürünleri Gör
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-slate-400 text-sm">Aradığınız kriterlere uygun ürün bulunamadı.</p>
+                  <button 
+                    onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
+                    className="text-xs font-bold text-euro-400 hover:underline"
+                  >
+                    Filtreleri Temizle
+                  </button>
+                </>
+              )}
             </div>
           ) : (
             <div className={`grid gap-2.5 sm:gap-6 ${mobileCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full`}>
@@ -272,6 +349,8 @@ export default function App() {
                   onAddToCart={handleAddToCart}
                   onOpenWizard={() => setIsWizardOpen(true)}
                   mobileCols={mobileCols}
+                  isFavorite={favorites.includes(product.id)}
+                  onToggleFavorite={toggleFavorite}
                 />
               ))}
             </div>
@@ -335,7 +414,7 @@ export default function App() {
         onAction={handleStoryAction}
       />
 
-      {/* 7. Product Modal (With Sticky Buy Bar / Floating Action Bar) */}
+      {/* 7. Product Modal (With Sticky Buy Bar / Floating Action Bar & Multi-Image Gallery) */}
       <ProductModal 
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
@@ -343,6 +422,9 @@ export default function App() {
         rates={rates}
         onAddToCart={handleAddToCart}
         onOpenWizard={() => setIsWizardOpen(true)}
+        isFavorite={selectedProduct ? favorites.includes(selectedProduct.id) : false}
+        onToggleFavorite={toggleFavorite}
+        onShowToast={showToast}
       />
 
       {/* Custom Order Wizard Modal */}
